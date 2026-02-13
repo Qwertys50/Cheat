@@ -21,7 +21,7 @@ makefolder("eut")
 local file_path = "eut/saved.json"
 
 local autofarms = {
-	["Autofarm Roulette"] = true,
+	["Autofarm Roulette"] = false,
 	["Autofarm Mango"] = false,
 	["Autofarm Puzzle"] = false,
 }
