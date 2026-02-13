@@ -8,22 +8,64 @@ local result, code = pcall(function()
 	return LocalizationService:GetCountryRegionForPlayerAsync(plr)
 end)
 
+local function tableLength(t)
+	local c = 0
+	for _ in pairs(t) do c = c + 1 end
+	return c
+end
 
 local color_validate = Color3.new(0.717647, 1, 0.666667)
 
+makefolder("eut")
+
+local file_path = "eut/saved.json"
+
 local autofarms = {
-	["Autofarm Roulette"] = false,
+	["Autofarm Roulette"] = true,
 	["Autofarm Mango"] = false,
 	["Autofarm Puzzle"] = false,
 }
-
 local vib = {}
+
+local function is_file(file_path)
+	for _, i in listfiles("eut") do
+		if file_path == i then
+			return true
+		end
+	end
+	return false
+end
+
+local function save_autofarms()
+	writefile(file_path, game:GetService("HttpService"):JSONEncode({Autofarm = autofarms, vib=vib}))
+end
+
+if not is_file(file_path) then
+
+	save_autofarms()
+else
+
+	local success, data = pcall(function()
+		return game:GetService("HttpService"):JSONDecode(readfile(file_path))
+	end)
+
+	if success and type(data) == "table" then
+
+		autofarms = data.Autofarm
+		vib = data.vib
+
+		print(vib)
+	end
+end
+
+
 
 local tweenInfo = TweenInfo.new(
 	0.3,
 	Enum.EasingStyle.Quad,
 	Enum.EasingDirection.Out
 )
+
 
 local ScreenFrame
 
@@ -34,11 +76,11 @@ end)
 
 if not susc then print("ВЫ ТОЧНО ТУДА ПОПАЛИ?!") return end
 
-
 local screen_game = Instance.new("ScreenGui", gui)
 
 local UI = loadstring(game:HttpGet('https://raw.githubusercontent.com/Qwertys50/gui_cheat/refs/heads/main/main.luau'))()
 local mainFrame, homeFrame, scrollFrame, pages, navFrame = UI.create_starter(screen_game)
+
 
 mainFrame.Visible = false
 
@@ -49,7 +91,7 @@ button_new.BorderSizePixel = 0
 button_new.BackgroundTransparency = 1
 
 if gui.gui.sidebar.menu.item_name.Text ~= "Menu" then
-	
+
 	button_new.Visible = false
 end
 
@@ -137,74 +179,92 @@ countryLabel.Text = code
 
 imageLabel.Image = game.Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size150x150)
 
-local button_roulette, _ = UI.create_button("Autofarm Roulette", scrollFrame)
-local button_manga, _ = UI.create_button("Autofarm Manga", scrollFrame)
+local button_roulette = UI.create_button("Autofarm Roulette", scrollFrame, autofarms["Autofarm Roulette"])
+local button_manga = UI.create_button("Autofarm Manga", scrollFrame, autofarms["Autofarm Mango"])
 
-local all_vib, button_puzzle = UI.create_vib("Autofarm Puzzle", "Open", {["Public Server"] = 1, ["Local Server"] = 2}, scrollFrame, 1)
+local quests_id = "puzzle_1"
+if not vib[quests_id] then vib[quests_id] = {} end
+
+local all_vib, button_puzzle = UI.create_vib("Autofarm Puzzle", "Open", {["Public Server"] = 1, ["Local Server"] = 2}, scrollFrame, 1, autofarms["Autofarm Puzzle"], vib[quests_id] ,color_validate)
+
+local function UpdateVib(quests_id, id, button_vib)
+	local container = button_vib.Parent
+
+	local wasSelected = vib[quests_id][id]
+	
+	for _, child in ipairs(container:GetChildren()) do
+		if child:IsA("TextButton") or child:FindFirstChild("TextButton") and child ~= button_vib then
+			local buttonId = child:GetAttribute("id")
+			if buttonId then
+				vib[quests_id][buttonId] = false
+				child.TextButton.Frame.BackgroundColor3 = Color3.new(0.764706, 0.764706, 0.764706)
+			end
+		end
+	end
+	
+	if not wasSelected then
+		button_vib.TextButton.Frame.BackgroundColor3 = color_validate
+		vib[quests_id][id] = true
+	end
+	
+end
 
 for _, button_vib in all_vib do
 	
+	if tableLength(vib[quests_id]) == 0 then
+		local id = button_vib:GetAttribute("id")
+		vib[quests_id][id] = true
+		
+		button_vib.TextButton.Frame.BackgroundColor3 = color_validate
+		UpdateVib(quests_id, id, button_vib)
+	end
+		
+	local _id = button_vib:GetAttribute("id")
+	
 	button_vib.TextButton.MouseButton1Up:Connect(function()
 		local id = button_vib:GetAttribute("id")
-
-		local quests_id = "puzzle_1"
-		if not vib[quests_id] then vib[quests_id] = {} end
-
-		local wasSelected = vib[quests_id][id]
-
-		local container = button_vib.Parent
-		for _, child in ipairs(container:GetChildren()) do
-			if child:IsA("TextButton") or child:FindFirstChild("TextButton") then
-				local buttonId = child:GetAttribute("id")
-				if buttonId then
-					vib[quests_id][buttonId] = false
-					child.TextButton.BackgroundColor3 = Color3.new(0.764706, 0.764706, 0.764706)
-				end
-			end
-		end
-
-		if not wasSelected then
-			button_vib.TextButton.BackgroundColor3 = color_validate
-			vib[quests_id][id] = true
-		end
+		UpdateVib(quests_id, id, button_vib)
+		
+		save_autofarms()
 	end)
 end
 
 button_roulette.MouseButton1Up:Connect(function()
-	
+
 	if autofarms["Autofarm Roulette"] then
-		
-		button_roulette.BackgroundColor3 = Color3.new(1, 0, 0)
+
 		autofarms["Autofarm Roulette"] = false
 	else
-		button_roulette.BackgroundColor3 = color_validate
 		autofarms["Autofarm Roulette"] = true
 	end
+	
+	save_autofarms()
 end)
 
 button_puzzle.MouseButton1Up:Connect(function()
 
 	if autofarms["Autofarm Puzzle"] then
 
-		button_puzzle.BackgroundColor3 = Color3.new(1, 0, 0)
 		autofarms["Autofarm Puzzle"] = false
 	else
-		button_puzzle.BackgroundColor3 = color_validate
 		autofarms["Autofarm Puzzle"] = true
 	end
+	
+	save_autofarms()
 end)
 
 button_manga.MouseButton1Up:Connect(function()
 
 	if autofarms["Autofarm Mango"] then
 
-		button_manga.BackgroundColor3 = Color3.new(1, 0, 0)
 		autofarms["Autofarm Mango"] = false
 	else
-		button_manga.BackgroundColor3 = color_validate
 		autofarms["Autofarm Mango"] = true
 	end
+	
+	save_autofarms()
 end)
+
 
 
 --######puzzle########
@@ -370,7 +430,7 @@ task.spawn(function()
 			end
 			if an == 4 then an = 0 end
 		elseif autofarms["Autofarm Puzzle"] and (vib["puzzle_1"] and vib["puzzle_1"]["Public Server"]) then
-			
+
 			local connections = getconnections(ScreenFrame.RegenerateStage.Activated)
 			if connections and #connections > 0 then
 				connections[1]:Fire()
@@ -383,9 +443,9 @@ end)
 task.spawn(function()
 
 	local function teleportBlocks()
-		
+
 		local player = plr
-		
+
 		local mangoTree = workspace.objects.mangotree.mangoes
 		if not mangoTree then return end
 
@@ -398,7 +458,7 @@ task.spawn(function()
 			end
 		end
 	end
-	
+
 	while task.wait(1) do
 		if autofarms["Autofarm Mango"] then
 			teleportBlocks() 
@@ -410,7 +470,7 @@ task.spawn(function()
 	while task.wait() do
 		if autofarms["Autofarm Roulette"] then
 			game:GetService("ReplicatedStorage"):WaitForChild("remotes"):WaitForChild("gamble"):InvokeServer()
-			
+
 		end
 	end
 end)
