@@ -453,9 +453,6 @@ function module.create_texts_button_click(name_par, name_sel, all_vib, parent, s
 				local num = tonumber(text)
 				if num then
 					input_event:Fire(num)
-					box.BackgroundColor = Color3.new(1, 1, 1)
-				else
-					box.BackgroundColor = Color3.new(1, 0.239215, 0.239215)
 				end
 			else
 				input_event:Fire(text)
