@@ -177,6 +177,13 @@ button_upg.MouseButton1Up:Connect(function()
     save_autofarms()
 end)
 
+local button_dupe = UI.create_button("Dupe upgrade", scrollFrame, autofarms["Dupe upgrade"])
+
+button_dupe.MouseButton1Up:Connect(function()
+	autofarms["Dupe upgrade"] = not autofarms["Dupe upgrade"]
+    save_autofarms()
+end)
+
 local button_widle = UI.create_button("Auto wigle", scrollFrame, autofarms["Auto wigle"])
 
 button_widle.MouseButton1Up:Connect(function()
