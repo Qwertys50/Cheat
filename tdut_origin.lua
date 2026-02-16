@@ -21,8 +21,11 @@ local file_path = "tree_1/saved.json"
 local autofarms = {
 	["Luck buttons"] = false,
     ["Auto upgrade"] = false,
-    ["Auto wigle"] = false
+    ["Auto wigle"] = false,
+    ["Dupe upgrade"] = false
 }
+local autofarms_ = autofarms
+
 local my_proz_1 = {}
 
 
@@ -52,9 +55,19 @@ else
         
 		autofarms = data.Autofarm
 		my_proz_1 = data.my_proz_1
-
+		
+		if autofarms then
+			for key, value in pairs(autofarms_) do
+				if autofarms[key] == nil then
+					autofarms[key] = value
+				end
+			end
+		end
+		
 	end
 end
+
+
 
 local screen_game = Instance.new("ScreenGui", gui)
 
@@ -202,6 +215,51 @@ task.spawn(function()
             for _, i in ipairs(combined) do
                     
                  if i:FindFirstChildWhichIsA("ClickDetector") and i.Bought.Value == false and autofarms["Auto upgrade"] then
+                        
+                    local ClickDetector = i:FindFirstChildWhichIsA("ClickDetector") :: ClickDetector
+                    ClickDetector.MaxActivationDistance = 10000000
+
+                    fireclickdetector(ClickDetector)
+                    task.wait()
+                end
+            end
+        end
+
+    end
+
+end)
+
+task.spawn(function()
+
+
+    while task.wait() do   
+        
+        if autofarms["Dupe upgrade"] == true then
+
+            local skill = workspace.Button.Skill
+            local jumpify = workspace.Button.Jumpify
+            local Unfailability = workspace.Button.Unfailability
+
+            local combined = {}
+            for _, child in ipairs(skill:GetChildren()) do
+                if child:FindFirstChildWhichIsA("ClickDetector") then
+                    table.insert(combined, child)
+                end
+            end
+            for _, child in ipairs(jumpify:GetChildren()) do
+                if child:FindFirstChildWhichIsA("ClickDetector") then
+                    table.insert(combined, child)
+                end
+            end
+            for _, child in ipairs(Unfailability:GetChildren()) do
+                if child:FindFirstChildWhichIsA("ClickDetector") then
+                    table.insert(combined, child)
+                end
+            end
+            
+            for _, i in ipairs(combined) do
+                    
+                 if i:FindFirstChildWhichIsA("ClickDetector") and i.Bought.Value == false and autofarms["Dupe upgrade"] then
                         
                     local ClickDetector = i:FindFirstChildWhichIsA("ClickDetector") :: ClickDetector
                     ClickDetector.MaxActivationDistance = 10000000
