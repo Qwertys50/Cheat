@@ -10,7 +10,7 @@ local function tableLength(t)
 	local c = 0
 	for _ in pairs(t) do c = c + 1 end
 	return c
-end
+end 
 
 local color_validate = Color3.new(0.717647, 1, 0.666667)
 
