@@ -265,7 +265,7 @@ task.spawn(function()
             
             for _, i in ipairs(combined) do
                     
-                 if i:FindFirstChildWhichIsA("ClickDetector") and i.Bought.Value == false and autofarms["Dupe upgrade"] then
+                 if i:FindFirstChildWhichIsA("ClickDetector") and autofarms["Dupe upgrade"] then
                         
                     local ClickDetector = i:FindFirstChildWhichIsA("ClickDetector") :: ClickDetector
                     ClickDetector.MaxActivationDistance = 10000000
