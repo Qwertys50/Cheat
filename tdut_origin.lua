@@ -179,7 +179,8 @@ task.spawn(function()
 
 
     while task.wait() do   
-        
+
+		print(autofarms["Auto upgrade"])
         if autofarms["Auto upgrade"] then
             local skill = workspace.Button.Skill
             local jumpify = workspace.Button.Jumpify
