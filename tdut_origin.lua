@@ -193,19 +193,17 @@ task.spawn(function()
             for _, child in ipairs(Unfailability:GetChildren()) do
                 table.insert(combined, child)
             end
-            task.spawn(function()
-                for _, i in ipairs(combined) do
+            for _, i in ipairs(combined) do
                     
-                    if i:FindFirstChildWhichIsA("ClickDetector") and i.Bought.Value == false and autofarms["Auto upgrade"] then
+                 if i:FindFirstChildWhichIsA("ClickDetector") and i.Bought.Value == false and autofarms["Auto upgrade"] then
                         
-                        local ClickDetector = i:FindFirstChildWhichIsA("ClickDetector") :: ClickDetector
-                        ClickDetector.MaxActivationDistance = 10000000
+                    local ClickDetector = i:FindFirstChildWhichIsA("ClickDetector") :: ClickDetector
+                    ClickDetector.MaxActivationDistance = 10000000
 
-                        fireclickdetector(ClickDetector)
-                        task.wait()
-                    end
+                    fireclickdetector(ClickDetector)
+                    task.wait()
                 end
-            end)
+            end
         end
 
         if autofarms["Auto wigle"] == true then
