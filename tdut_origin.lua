@@ -10,7 +10,7 @@ local function tableLength(t)
 	local c = 0
 	for _ in pairs(t) do c = c + 1 end
 	return c
-end 
+end
 
 local color_validate = Color3.new(0.717647, 1, 0.666667)
 
@@ -185,13 +185,19 @@ task.spawn(function()
 
             local combined = {}
             for _, child in ipairs(skill:GetChildren()) do
-                table.insert(combined, child)
+                if child:FindFirstChildWhichIsA("ClickDetector") and child.Bought.Value == false then
+                    table.insert(combined, child)
+                end
             end
             for _, child in ipairs(jumpify:GetChildren()) do
-                table.insert(combined, child)
+                if child:FindFirstChildWhichIsA("ClickDetector") and child.Bought.Value == false then
+                    table.insert(combined, child)
+                end
             end
             for _, child in ipairs(Unfailability:GetChildren()) do
-                table.insert(combined, child)
+                if child:FindFirstChildWhichIsA("ClickDetector") and child.Bought.Value == false then
+                    table.insert(combined, child)
+                end
             end
             for _, i in ipairs(combined) do
                     
