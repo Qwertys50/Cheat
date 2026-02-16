@@ -198,7 +198,6 @@ task.spawn(function()
         
         if autofarms["Auto upgrade"] == true then
 
-            print(1)
             local skill = workspace.Button.Skill
             local jumpify = workspace.Button.Jumpify
             local Unfailability = workspace.Button.Unfailability
