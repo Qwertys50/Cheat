@@ -211,7 +211,7 @@ task.spawn(function()
 end)
 
 task.spawn(function()
-    while task.wait()
+    while task.wait() do
         if autofarms["Auto wigle"] == true then
             if workspace:FindFirstChild("Unlock") and workspace.Unlock:FindFirstChild("UF23") then
 
