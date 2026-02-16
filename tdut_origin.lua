@@ -198,7 +198,9 @@ task.spawn(function()
                     
                     if i:FindFirstChildWhichIsA("ClickDetector") and i.Bought.Value == false and autofarms["Auto upgrade"] then
                         
-                        local ClickDetector = i:FindFirstChildWhichIsA("ClickDetector")
+                        local ClickDetector = i:FindFirstChildWhichIsA("ClickDetector") :: ClickDetector
+                        ClickDetector.MaxActivationDistance = 10000000
+
                         fireclickdetector(ClickDetector)
                         task.wait()
                     end
