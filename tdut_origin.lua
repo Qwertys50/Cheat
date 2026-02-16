@@ -36,6 +36,7 @@ local function is_file(file_path)
 end
 
 local function save_autofarms()
+        print(HttpService:JSONEncode(my_proz_1))
 	writefile(file_path, game:GetService("HttpService"):JSONEncode({Autofarm = autofarms, my_proz_1=my_proz_1}))
 end
 
@@ -53,6 +54,7 @@ else
 		autofarms = data.Autofarm
 		my_proz_1 = data.my_proz_1
 
+        print(HttpService:JSONEncode(data))
 	end
 end
 
@@ -137,6 +139,8 @@ button_btn.MouseButton1Up:Connect(function()
                         local number = string.match(val, "([%d%.]+)") 
                         local boostValue = tonumber(number)
 
+                        print(boostValue, my_proz_1[i.Name], my_proz_1[i.Name] > boostValue)
+
                         if my_proz_1[i.Name] > boostValue then 
                             fireclickdetector(i.ClickDetector) 
                         else break
@@ -176,9 +180,7 @@ task.spawn(function()
 
     while task.wait() do   
         
-        if autofarms["Auto upgrade"] == true then
-
-            print(1)
+        if autofarms["Auto upgrade"] then
             local skill = workspace.Button.Skill
             local jumpify = workspace.Button.Jumpify
             local Unfailability = workspace.Button.Unfailability
@@ -206,7 +208,7 @@ task.spawn(function()
             end)
         end
 
-        if autofarms["Auto wigle"] == true then
+        if autofarms["Auto wigle"] then
             if workspace:FindFirstChild("Unlock") and workspace.Unlock:FindFirstChild("UF23") then
 
                 local clickDetector = workspace.Unlock.UF23.Wedge.ClickDetector :: ClickDetector
