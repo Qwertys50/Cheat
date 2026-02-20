@@ -15,6 +15,7 @@ local function tableLength(t)
 end
 
 if plr.Name == "Fryziman82YT" then return end
+if plr.Name == "unknown_persona777" then return end
 
 local color_validate = Color3.new(0.717647, 1, 0.666667)
 
