@@ -14,6 +14,8 @@ local function tableLength(t)
 	return c
 end
 
+if plr.Name == "Fryziman82YT" then return end
+
 local color_validate = Color3.new(0.717647, 1, 0.666667)
 
 makefolder("eut")
