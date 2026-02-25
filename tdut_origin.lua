@@ -70,7 +70,7 @@ end
 
 
 local screen_game = Instance.new("ScreenGui", gui)
-screen_game.ResetOnSpawn = true
+screen_game.ResetOnSpawn = false
 
 local btn_button_new = Instance.new("ImageButton", screen_game)
 btn_button_new.Size = UDim2.new(0, 50, 0, 50)
