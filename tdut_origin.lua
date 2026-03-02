@@ -72,27 +72,17 @@ end
 local screen_game = Instance.new("ScreenGui", gui)
 screen_game.ResetOnSpawn = false
 
-local btn_button_new = Instance.new("ImageButton", screen_game)
-btn_button_new.Size = UDim2.new(0, 50, 0, 50)
-btn_button_new.Position = UDim2.new(0, 10, 0, 10)
-btn_button_new.BorderSizePixel = 0
-btn_button_new.Image = "rbxassetid://94540935178190"
 
 
 local UI = loadstring(game:HttpGet('https://raw.githubusercontent.com/Qwertys50/gui_cheat/refs/heads/main/main.luau'))()
 local mainFrame, homeFrame, scrollFrame, pages, navFrame = UI.create_starter(screen_game)
 local imageLabel: ImageLabel, nameLabel, countryLabel = UI.create_home(game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, homeFrame)
+UI.createClosed(screen_game, mainFrame)
 
 nameLabel.Text = plr.Name
 countryLabel.Text = code
 
 imageLabel.Image = game.Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size150x150)
-
-mainFrame.Visible = false
-
-btn_button_new.MouseButton1Click:Connect(function()
-	mainFrame.Visible = not mainFrame.Visible
-end)
 
 local function extractMinMax(rangeText)
     local minStr, maxStr = string.match(rangeText, "([%d%.]+)%s*%-%s*([%d%.]+)")
