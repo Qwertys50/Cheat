@@ -1,8 +1,48 @@
+local HttpService = game:GetService("HttpService")
+local SERVER_URL = "http://100.125.136.26:5000"
+local plr = game.Players.LocalPlayer
+local isPolling = false
+
+local coreGui = game:GetService("CoreGui")
+local topBar = coreGui.TopBarApp.TopBarApp
+
+local function GetTextureFromAssetId(assetId: number): string
+	return "https://www.roblox.com/Thumbs/Asset.ashx?width=420&height=420&assetId="..assetId
+end
+
+local LeftBar = topBar.UnibarLeftFrame :: Frame
+
 local function CreateFrame(parent)
 	local frame = Instance.new("Frame", parent)
 	frame.BorderSizePixel = 0
 	frame.BackgroundColor3 = Color3.new(1, 1, 1)
 	return frame
+end
+
+local function CreateButton(frame)
+	local btn = Instance.new("TextButton", frame)
+	btn.BorderSizePixel = 0
+	btn.BackgroundColor3 = Color3.new(1, 1, 1)
+	pcall(function()
+		btn.FontFace = Font.fromId(12187375716, Enum.FontWeight.Bold, Enum.FontStyle.Normal)
+	end)
+	
+	btn.TextSize = 14
+	return btn
+end
+
+local function CreateImageButton(frame)
+	local btn = Instance.new("ImageButton", frame)
+	btn.BorderSizePixel = 0
+	btn.BackgroundColor3 = Color3.new(1, 1, 1)
+	btn.AutoButtonColor = false
+		
+	return btn
+end
+
+local function create_UICorner(radius: UDim, parent)
+	local corner = Instance.new("UICorner", parent)
+	corner.CornerRadius = radius
 end
 
 local function create_UIList(padding: UDim, align: Enum.HorizontalAlignment, parent)
@@ -33,29 +73,6 @@ local function CreateScrollFrame(name: string, parent, hasList: boolean?)
 	return frame
 end
 
-local function CreateButton(frame)
-	local btn = Instance.new("TextButton", frame)
-	btn.BorderSizePixel = 0
-	btn.BackgroundColor3 = Color3.new(1, 1, 1)
-	pcall(function()
-		btn.FontFace = Font.fromId(12187375716, Enum.FontWeight.Bold, Enum.FontStyle.Normal)
-	end)
-	
-	btn.TextSize = 14
-	return btn
-end
-
-local function CreateTextLabel(parent)
-	local lbl = Instance.new("TextLabel", parent)
-	lbl.BorderSizePixel = 0
-	lbl.BackgroundTransparency = 1
-	lbl.BackgroundColor3 = Color3.new(1, 1, 1)
-	lbl.TextColor3 = Color3.new(0, 0, 0)
-	lbl.TextSize = 14
-	lbl.FontFace = Font.fromId(12187375716, Enum.FontWeight.Bold, Enum.FontStyle.Normal)
-	return lbl
-end
-
 local function CreateTextBox(parent, placeholder)
 	local box = Instance.new("TextBox", parent)
 	box.BorderSizePixel = 0
@@ -69,137 +86,47 @@ local function CreateTextBox(parent, placeholder)
 	return box
 end
 
-local function GetTextureFromAssetId(assetId: number): string
-	return "https://www.roblox.com/Thumbs/Asset.ashx?width=420&height=420&assetId="..assetId
+local function CreateTextLabel(parent)
+	local lbl = Instance.new("TextLabel", parent)
+	lbl.BorderSizePixel = 0
+	lbl.BackgroundTransparency = 1
+	lbl.BackgroundColor3 = Color3.new(1, 1, 1)
+	lbl.TextColor3 = Color3.new(0, 0, 0)
+	lbl.TextSize = 14
+	lbl.FontFace = Font.fromId(12187375716, Enum.FontWeight.Bold, Enum.FontStyle.Normal)
+	return lbl
 end
 
-local function CreateAddSpis(parent, info)
-    local frame = CreateButton(parent)
-    frame.Text = ""
-    frame.Size = UDim2.new(1, 0, 0, 30)
-    frame.AutoButtonColor = false
+local function SendRequests(image_id, sound_id)    
+    if not SERVER_URL then return end
 
-    local text_ = CreateTextLabel(frame)
-    text_.Text = info["name"]
-    text_.Size = UDim2.new(0.5, 0, 1, 0)
-    text_.Position = UDim2.new(0.5, 0, 0.5, 0)
-    text_.AnchorPoint = Vector2.new(0.5, 0.5)
-    
-	local img = Instance.new("ImageLabel", frame)
-	img.BackgroundTransparency = 1
-	img.Size = UDim2.new(0, 30, 0, 30)
-    img.Position = UDim2.new(0, 15, 0.5, 0)
-    img.AnchorPoint = Vector2.new(0.5, 0.5)
-    img.Image = GetTextureFromAssetId(info.image:match("%d+"))
-
-    return frame
-end
-
-local selected_infos = {
-    {
-        sound = "rbxassetid://122653941885659",
-        image =  "rbxassetid://90164279415082",
-        name = "Mambo"
+    local pressData = {
+        player = {
+            id = plr.UserId,
+            name = plr.Name
+        },
+		info = {
+			image_id = image_id,
+			sound_id = sound_id
+		}
     }
-}
-makefolder("sound_free")
-
-local file_path = "sound_free/saved.json"
-
-local function is_file(file_path)
-	for _, i in listfiles("sound_free") do
-		if file_path == i then
-			return true
-		end
-	end
-	return false
+    local success, response = pcall(function()
+        return request({
+            Url = SERVER_URL .. "/button_press",
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            },
+            Body = HttpService:JSONEncode(pressData)
+        })
+    end)
 end
 
-local function save_autofarms()
-	writefile(file_path, game:GetService("HttpService"):JSONEncode({selected_infos = selected_infos}))
-end
-
-if not is_file(file_path) then
-
-	save_autofarms()
-else
-
-	local success, data = pcall(function()
-		return game:GetService("HttpService"):JSONDecode(readfile(file_path))
+local function createBillboardWithTween(imageId, soundId, character)
+	task.spawn(function()
+		SendRequests(imageId, soundId)
 	end)
-
-	if success and type(data) == "table" then
-        
-		selected_infos = data.selected_infos
-		
-	end
-end
-
-local gui_ = Instance.new("ScreenGui", game.Players.LocalPlayer.PlayerGui)
-local frame = CreateFrame(gui_)
-
-local scroll = CreateScrollFrame("hm", frame, true)
-scroll.Size = UDim2.new(1, 0, 0.9, 0)
-scroll.Visible = true
-
-local btn_ = CreateButton(frame)
-btn_.Position = UDim2.new(0, 0, 0.9, 0)
-btn_.Size = UDim2.new(1, 0, 0.1, 0)
-btn_.Text = "Добавить новый"
-
-local createFrame = CreateFrame(frame)
-createFrame.Size = UDim2.new(1, 0, 0.9, 0)
-createFrame.Position = UDim2.new(0, 0, 0, 0)
-createFrame.Visible = false
-createFrame.BackgroundColor3 = Color3.new(0.95, 0.95, 0.95)
-
-local createList = Instance.new("UIListLayout", createFrame)
-createList.Padding = UDim.new(0, 10)
-createList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-createList.VerticalAlignment = Enum.VerticalAlignment.Top
-createList.SortOrder = Enum.SortOrder.LayoutOrder
-
-local soundBox = CreateTextBox(createFrame, "Введите sound ID (rbxassetid://...)")
-soundBox.Size = UDim2.new(0.9, 0, 0.2, 0)
-soundBox.Text = ""
-soundBox.LayoutOrder = 1
-soundBox.TextScaled = true
-
-local imageBox = CreateTextBox(createFrame, "Введите image ID (rbxassetid://...)")
-imageBox.Size = UDim2.new(0.9, 0, 0.2, 0)
-imageBox.Text = ""
-imageBox.LayoutOrder = 2
-imageBox.TextScaled = true
-
-local nameBox = CreateTextBox(createFrame, "Введите название")
-nameBox.Size = UDim2.new(0.9, 0, 0.2, 0)
-nameBox.Text = ""
-nameBox.LayoutOrder = 3
-nameBox.TextScaled = true
-
-local addBtn = CreateButton(createFrame)
-addBtn.Size = UDim2.new(0.9, 0, 0.2, 0)
-addBtn.Text = "Добавить"
-addBtn.LayoutOrder = 4
-addBtn.BackgroundColor3 = Color3.new(0.3, 0.7, 0.3)
-
-frame.Size = UDim2.new(0, 150, 0, 100)
-frame.Position = UDim2.new(0.9, 0, 0.7, 0)
-frame.AnchorPoint = Vector2.new(0.5, 0.5)
-
-local _close = CreateButton(gui_)
-_close.Size = UDim2.new(0, 100, 0, 50)
-_close.Position = UDim2.new(0, 0, 0.8, 0)
-_close.AnchorPoint = Vector2.new(0, 0.5)
-_close.Text = "Close"
-_close.BackgroundColor3 = Color3.new(0.501960, 0.376470, 0.376470)
-_close.FontFace = Font.fromId(12187375716, Enum.FontWeight.Bold, Enum.FontStyle.Normal)
-
-
-local function createBillboardWithTween(imageId, soundId)
-
-    local plr = game.Players.LocalPlayer
-    local character = plr.Character
+	
     local head = character.PrimaryPart
     
     local TweenService = game:GetService("TweenService")
@@ -239,9 +166,6 @@ local function createBillboardWithTween(imageId, soundId)
         StudsOffsetWorldSpace = Vector3.new(0, 5, 0)
     }
     
-    local targetTransparency = {
-        ImageTransparency = 0 
-    }
     game:GetService("ContentProvider"):PreloadAsync({sound})
 
     sound:Play()
@@ -260,11 +184,217 @@ local function createBillboardWithTween(imageId, soundId)
     transparencyTween.Completed:Connect(function()    
         transparencyTween_:Play()
         transparencyTween_.Completed:Connect(function()
-            
             new:Destroy()
         end)
     end)
 end
+
+local function CreateAddSpis(parent, info)
+    local size = 50
+
+    local frame = CreateButton(parent)
+    frame.BackgroundTransparency = 0.4
+    frame.Text = ""
+    frame.Size = UDim2.new(1, 0, 0, size)
+    frame.AutoButtonColor = false
+    create_UICorner(UDim.new(0, 4), frame)
+
+    local text_ = CreateTextLabel(frame)
+    text_.Text = info["name"]
+    text_.TextColor3 = Color3.new(1, 1, 1)
+    text_.Size = UDim2.new(0.5, 0, 1, 0)
+    text_.Position = UDim2.new(0.5, 0, 0.5, 0)
+    text_.AnchorPoint = Vector2.new(0.5, 0.5)
+    
+	local img = Instance.new("ImageLabel", frame)
+	img.BackgroundTransparency = 1
+	img.Size = UDim2.new(0, size-10, 0, size-10)
+    img.Position = UDim2.new(0, size/2, 0.5, 0)
+    img.AnchorPoint = Vector2.new(0.5, 0.5)
+    img.Image = GetTextureFromAssetId(info.image:match("%d+"))
+    create_UICorner(UDim.new(1, 0), img)
+
+    return frame
+end
+
+local function startLongPolling()
+    if isPolling then return end
+    isPolling = true
+    
+    task.spawn(function()
+        while task.wait(0.1) do
+			if not SERVER_URL then continue end
+            if not isPolling then continue end
+
+            local success, response = pcall(function()
+                return request({
+                    Url = SERVER_URL .. "/poll_events",
+                    Method = "GET",
+                    Headers = {
+                        ["Cache-Control"] = "no-cache"
+                    },
+                    Timeout = 35
+                })
+            end)
+            
+            if success and response.Success then
+                local data = HttpService:JSONDecode(response.Body)
+                
+                if data.type and data.type ~= "timeout" then
+                    if data.type == "button_press" then
+                        if data.player.id ~= plr.UserId then
+                            local name = data.player.name
+							
+							local plr_
+							for _, i in ipairs(game.Players:GetPlayers()) do
+								if i.Name == name then plr_ = i end
+							end
+							if not plr_ then continue end
+							
+							local character = plr_.Character
+							task.spawn(function()
+								createBillboardWithTween(
+									data.info.image_id, data.info.sound_id, character
+								)									
+							end)
+                        end
+                    end
+                end
+            else
+                task.wait(5)
+            end
+            
+            task.wait(0.1)
+        end
+    end)
+end
+
+local selected_infos = {
+    {
+        sound = "rbxassetid://122653941885659",
+        image =  "rbxassetid://90164279415082",
+        name = "Mambo"
+    }
+}
+
+makefolder("sound_free")
+local file_path = "sound_free/saved.json"
+
+local function is_file(file_path)
+	for _, i in listfiles("sound_free") do
+		if file_path == i then
+			return true
+		end
+	end
+	return false
+end
+
+local function save_autofarms()
+	writefile(file_path, game:GetService("HttpService"):JSONEncode({selected_infos = selected_infos}))
+end
+
+if not is_file(file_path) then
+	save_autofarms()
+else
+	local success, data = pcall(function()
+		return game:GetService("HttpService"):JSONDecode(readfile(file_path))
+	end)
+
+	if success and type(data) == "table" then
+		selected_infos = data.selected_infos
+	end
+end
+
+local frame = CreateFrame(LeftBar)
+create_UICorner(UDim.new(1, 0), frame)
+
+frame.BackgroundColor3 = Color3.fromRGB(18, 18, 21)
+frame.Size = UDim2.new(0, 48, 0, 44)
+frame.Position = UDim2.new(0, LeftBar.UnibarMenu.AbsoluteSize.X + 10, 0, 0)
+
+LeftBar.UnibarMenu:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+    frame.Position = UDim2.new(0, LeftBar.UnibarMenu.AbsoluteSize.X + 10, 0, 0)
+end)
+
+local btn = CreateImageButton(frame)
+btn.Image = GetTextureFromAssetId("88204284600992")
+btn.BackgroundTransparency = 1
+btn.Size = UDim2.new(0.5, 0, 0.5, 0)
+btn.Position = UDim2.new(0.5, 0, 0.5, 0)
+btn.AnchorPoint = Vector2.new(0.5, 0.5)
+btn.AutoButtonColor = true
+
+local mainFrame = CreateFrame(frame)
+mainFrame.Visible = false
+create_UICorner(UDim.new(0, 8), mainFrame)
+
+mainFrame.Position = UDim2.new(0, -52, 0, 50)
+mainFrame.Size = UDim2.new(0, 192, 0, 280)
+mainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 21)
+mainFrame.BackgroundTransparency = 0.3
+
+local mainButton = CreateButton(mainFrame)
+mainButton.Text = "Create"
+mainButton.Size = UDim2.new(1, 0, 0, 40)
+mainButton.BackgroundTransparency = 1
+mainButton.TextSize = 20
+create_UICorner(UDim.new(0, 8), mainButton)
+
+mainButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+local clrs = mainFrame.BackgroundColor3
+
+mainButton.MouseEnter:Connect(function()
+    mainButton.BackgroundColor3 = Color3.fromRGB(145, 145, 145)
+    mainButton.BackgroundTransparency = 0
+end)
+
+mainButton.MouseLeave:Connect(function()
+    mainButton.BackgroundColor3 = clrs
+    mainButton.BackgroundTransparency = 1
+end)
+
+btn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = not mainFrame.Visible
+end)
+
+local createFrame = CreateFrame(mainFrame)
+createFrame.Visible = false
+createFrame.Position = UDim2.new(0, 0, 0, 40)
+createFrame.Size = UDim2.new(1, 0, 1, -40)
+createFrame.BackgroundTransparency = 1
+
+local soundBox = CreateTextBox(createFrame, "Введите sound ID")
+soundBox.Size = UDim2.new(0.9, 0, 0, 30)
+soundBox.Text = ""
+soundBox.Position = UDim2.new(0.5, 0, 0, 0)
+soundBox.AnchorPoint = Vector2.new(0.5, 0)
+soundBox.TextScaled = true
+
+local imageBox = CreateTextBox(createFrame, "Введите image ID")
+imageBox.Size = UDim2.new(0.9, 0, 0, 30)
+imageBox.Position = UDim2.new(0.5, 0, 0, 40)
+imageBox.Text = ""
+imageBox.AnchorPoint = Vector2.new(0.5, 0)
+imageBox.TextScaled = true
+
+local nameBox = CreateTextBox(createFrame, "Введите название")
+nameBox.Size = UDim2.new(0.9, 0, 0, 30)
+nameBox.Text = ""
+nameBox.Position = UDim2.new(0.5, 0, 0, 80)
+nameBox.AnchorPoint = Vector2.new(0.5, 0)
+nameBox.TextScaled = true
+
+local addBtn = CreateButton(createFrame)
+addBtn.Size = UDim2.new(0.9, 0, 0, 30)
+addBtn.Text = "Добавить"
+addBtn.Position = UDim2.new(0.5, 0, 0, 120)
+addBtn.AnchorPoint = Vector2.new(0.5, 0)
+addBtn.BackgroundColor3 = Color3.new(0.3, 0.7, 0.3)
+create_UICorner(UDim.new(0, 4), addBtn)
+
+local scroll = CreateScrollFrame("Scroll", mainFrame, true)
+scroll.Position = UDim2.new(0, 0, 0, 40)
+scroll.Size = UDim2.new(1, 0, 1, -40)
 
 local function UpdateScrollList()
     for _, child in ipairs(scroll:GetChildren()) do
@@ -274,14 +404,31 @@ local function UpdateScrollList()
     end
     
     for _, i in ipairs(selected_infos) do
-        local btn = CreateAddSpis(scroll, i)
-        btn.MouseButton1Click:Connect(function()
-            createBillboardWithTween(
-                i.image,i.sound
-            )
+        local item = CreateAddSpis(scroll, i)
+        item.MouseButton1Click:Connect(function()
+            local character = plr.Character
+            if character then
+                task.spawn(function()
+                    createBillboardWithTween(i.image, i.sound, character)
+                end)
+            end
         end)
     end
 end
+
+UpdateScrollList()
+
+mainButton.MouseButton1Click:Connect(function()
+    if mainButton.Text == "Create" then
+        scroll.Visible = false
+        createFrame.Visible = true
+        mainButton.Text = "Back"
+    else
+        scroll.Visible = true
+        createFrame.Visible = false
+        mainButton.Text = "Create"
+    end
+end)
 
 addBtn.MouseButton1Click:Connect(function()
     local sound = soundBox.Text
@@ -289,7 +436,6 @@ addBtn.MouseButton1Click:Connect(function()
     local name = nameBox.Text
     
     if sound ~= "" and image ~= "" and name ~= "" then
-
         table.insert(selected_infos, {
             sound = sound,
             image = image,
@@ -297,7 +443,7 @@ addBtn.MouseButton1Click:Connect(function()
         })
         
         UpdateScrollList()
-        --save_autofarms()
+        save_autofarms()
 
         soundBox.Text = ""
         imageBox.Text = ""
@@ -305,30 +451,84 @@ addBtn.MouseButton1Click:Connect(function()
         
         scroll.Visible = true
         createFrame.Visible = false
-        btn_.Visible = true
-    else
-        warn("Заполните все поля!")
+        mainButton.Text = "Create"
     end
 end)
 
-btn_.MouseButton1Click:Connect(function()
-    scroll.Visible = false
-    createFrame.Visible = true
-    btn_.Visible = false
-end)
+local urlFrame = CreateFrame(mainFrame)
+urlFrame.Size = UDim2.new(1, 0, 1, 0)
+urlFrame.Position = UDim2.new(0, 0, 0, 0)
+urlFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 21)
+urlFrame.BackgroundTransparency = 0.1
+urlFrame.Visible = true
+urlFrame.ZIndex = 10
+create_UICorner(UDim.new(0, 8), urlFrame)
 
-_close.MouseButton1Click:Connect(function()
-    frame.Visible = not frame.Visible
-    if frame.Visible == true then
-        _close.Text = "Close"
+local urlList = create_UIList(UDim.new(0, 10), Enum.HorizontalAlignment.Center, urlFrame)
+urlList.VerticalAlignment = Enum.VerticalAlignment.Center
 
-        scroll.Visible = true
-        createFrame.Visible = false
-        btn_.Visible = true
-    else
-        _close.Text = "Open"
+local urlInput = CreateTextBox(urlFrame, "http://your-server.com:5000")
+urlInput.Size = UDim2.new(0.9, 0, 0.3, 0)
+urlInput.LayoutOrder = 2
+urlInput.Name = "1"
+urlInput.Text = SERVER_URL
+
+local urlButtonsFrame = CreateFrame(urlFrame)
+urlButtonsFrame.Size = UDim2.new(0.9, 0, 0, 40)
+urlButtonsFrame.BackgroundTransparency = 1
+urlButtonsFrame.LayoutOrder = 3
+urlButtonsFrame.Name = "2"
+
+local urlButtonsList = Instance.new("UIListLayout", urlButtonsFrame)
+urlButtonsList.FillDirection = Enum.FillDirection.Horizontal
+urlButtonsList.Padding = UDim.new(0, 10)
+urlButtonsList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+urlButtonsList.VerticalAlignment = Enum.VerticalAlignment.Center
+
+local enterBtn = CreateButton(urlButtonsFrame)
+enterBtn.Size = UDim2.new(0.45, 0, 1, 0)
+enterBtn.Text = "Enter"
+enterBtn.BackgroundColor3 = Color3.new(0.3, 0.7, 0.3)
+create_UICorner(UDim.new(0, 4), enterBtn)
+
+local closeUrlBtn = CreateButton(urlButtonsFrame)
+closeUrlBtn.Size = UDim2.new(0.45, 0, 1, 0)
+closeUrlBtn.Text = "Close"
+closeUrlBtn.BackgroundColor3 = Color3.new(0.7, 0.3, 0.3)
+create_UICorner(UDim.new(0, 4), closeUrlBtn)
+
+createFrame.Visible = false
+scroll.Visible = false
+mainButton.Visible = false
+
+local function openMainGUI()
+    urlFrame.Visible = false
+
+    scroll.Visible = true
+    mainButton.Visible = true
+    
+    startLongPolling()
+end
+
+enterBtn.MouseButton1Click:Connect(function()
+    local url = urlInput.Text:match("^%s*(.-)%s*$")
+    if url ~= "" then
+        SERVER_URL = url
+        openMainGUI()
     end
 end)
 
+closeUrlBtn.MouseButton1Click:Connect(function()
+    SERVER_URL = nil
+    openMainGUI()
+end)
 
-UpdateScrollList()
+urlInput.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        local url = urlInput.Text:match("^%s*(.-)%s*$")
+        if url ~= "" then
+            SERVER_URL = url
+            openMainGUI()
+        end
+    end
+end)
