@@ -1,0 +1,376 @@
+if not table.find({18886736851, 113866591216151}, game.PlaceId) then return end
+local token = "MTQ3NjE1MTA2NTI4MzAwNjQ3NA.Gkj5tN.KxSdqqRM2-Y5S_0iOL1pKAB_naZIHJhH512kck"
+
+local map = workspace.Map :: Folder
+local Lighting = game:GetService("Lighting")
+
+local gui = Instance.new("ScreenGui", game.Players.LocalPlayer.PlayerGui)
+gui.ResetOnSpawn = false
+
+local frame = Instance.new("TextLabel", gui)
+frame.Text = "СВП: 0:00:00"
+frame.Size = UDim2.new(0.06, 0, 0.05, 0)
+frame.Position = UDim2.new(0, 0, 0.5, 0)
+frame.AnchorPoint = Vector2.new(0, 0.5)
+frame.TextScaled = true
+
+local exit_Current = map:FindFirstChildWhichIsA("Folder")
+
+for _, i in ipairs(workspace:GetDescendants()) do
+    
+    if i.Name == "Roof" then
+        i:Destroy()
+    end
+end
+
+local function CreateHigh(Parent, color )
+    if not Parent:FindFirstChildWhichIsA("BillboardGui") then
+
+        local billboard = Instance.new("BillboardGui", Parent)
+        billboard.Name = "BillboardGui"
+        billboard.Size = UDim2.new(0, 15, 0, 15)
+        billboard.AlwaysOnTop = true
+
+        billboard.MaxDistance = 3000
+        
+        local frame = Instance.new("Frame", billboard)
+        frame.Name = "Frame"
+        frame.Size = UDim2.new(1, 0, 1, 0)
+        frame.BackgroundColor3 = color
+        frame.BorderSizePixel = 0
+    end
+end
+
+local function urlencode(str)
+    if str then
+        str = string.gsub(str, "([^%w%.%- ])", function(c)
+            return string.format("%%%02X", string.byte(c))
+        end)
+        str = string.gsub(str, " ", "%%20")
+        return str
+    end
+    return str
+end
+
+local function updateAverageDisplay(times)
+    if #times > 0 then
+        local sum = 0
+        for _, t in ipairs(times) do sum = sum + t end
+        local average_seconds = sum / #times
+        
+        local avg_minutes = math.floor(average_seconds / 60)
+        local avg_seconds = average_seconds % 60
+        
+        frame.Text = string.format("СРД: %02d:%02d", avg_minutes, math.floor(avg_seconds))
+    end
+end
+
+local function GetTimeLvl(lvl)
+    local page = 0
+    local maxPage = 3
+    local times = {}
+    
+    local headers = {
+        ["Accept"] = "*/*",
+        ["Accept-Language"] = "ru,en-US;q=0.9",
+        ["Priority"] = "u=1, i",
+        ["Sec-Ch-Ua"] = '"Not-A.Brand";v="99", "Chromium";v="124"',
+        ["Sec-Ch-Ua-Mobile"] = "?0",
+        ["Sec-Ch-Ua-Platform"] = '"Windows"',
+        ["Sec-Fetch-Dest"] = "empty",
+        ["Sec-Fetch-Mode"] = "cors",
+        ["Sec-Fetch-Site"] = "same-origin",
+        ["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9153 Chrome/124.0.6367.243 Electron/30.1.0 Safari/537.36",
+        ["X-Debug-Options"] = "bugReporterEnabled",
+        ["X-Discord-Locale"] = "ru",
+        ["X-Discord-Timezone"] = "Europe/Moscow",
+        ['Authorization'] = token,
+        ['Content-Type'] = 'application/json'
+    }
+    
+    local function makeRequestWithRetry(url)
+        while true do
+            local response = request({
+                Url = url,
+                Method = "GET",
+                Headers = headers,
+            })
+            
+            if response.Success then
+                return response
+            else
+                -- Check if it's a rate limit response
+                local success, data = pcall(function()
+                    return game:GetService("HttpService"):JSONDecode(response.Body)
+                end)
+                
+                if success and data.retry_after then
+                    print("Rate limited, waiting " .. data.retry_after .. " seconds...")
+                    wait(data.retry_after)
+                else
+                    print("Request failed:", response.Body, 4353452)
+                    return nil
+                end
+            end
+        end
+    end
+    
+    local response = makeRequestWithRetry("https://discord.com/api/v9/guilds/1111993793663750186/messages/search?content="..urlencode(lvl).."&sort_by=timestamp&sort_order=desc&offset="..tostring(page*25))
+    
+    if response then
+        page += 1
+        
+        local json = game:GetService("HttpService"):JSONDecode(response.Body)
+        
+        -- Parse first page
+        for _, i in ipairs(json.messages) do
+            local content = i[1].content
+            
+            local minutes, seconds = content:match("in `(%d+):([%d%.]+)`")
+            if minutes and seconds then
+                local all_seconds = tonumber(minutes) * 60 + tonumber(seconds)
+                table.insert(times, all_seconds)
+                updateAverageDisplay(times)
+            end
+        end
+        
+        while page <= maxPage do
+            local response_ = makeRequestWithRetry("https://discord.com/api/v9/guilds/1111993793663750186/messages/search?content="..urlencode(lvl).."&sort_by=timestamp&sort_order=desc&offset="..tostring(page*25))
+            
+            if response_ then
+                page += 1
+                local json_ = game:GetService("HttpService"):JSONDecode(response_.Body)
+                
+                for _, i in ipairs(json_.messages) do
+                    local content = i[1].content
+                    
+                    local minutes, seconds = content:match("in `(%d+):([%d%.]+)`")
+                    if minutes and seconds and tonumber(minutes) then
+                        local all_seconds = tonumber(minutes) * 60 + tonumber(seconds)
+                        table.insert(times, all_seconds)
+                        updateAverageDisplay(times)
+                    end
+                end
+            else break
+            end
+            
+            task.wait(0.5)
+        end
+        
+        if #times > 0 then
+            local sum = 0
+            for _, t in ipairs(times) do sum = sum + t end
+            local average_seconds = sum / #times
+            
+            local avg_minutes = math.floor(average_seconds / 60)
+            local avg_seconds = average_seconds % 60
+            
+            local result = string.format("СРД: %02d:%02d", avg_minutes, math.floor(avg_seconds))
+            frame.Text = result
+            return result
+        end
+    end
+    
+    return nil
+end
+
+
+if exit_Current then
+
+    GetTimeLvl(exit_Current.Name)
+
+    if workspace.Debris.Alive:FindFirstChild(exit_Current.Name.." Enemy") then
+        for _, i in ipairs(workspace.Debris.Alive[exit_Current.Name.." Enemy"]:GetChildren()) do
+            
+            if i:FindFirstChildWhichIsA("Model") then
+                
+                for _, _i in ipairs(i:GetChildren()) do
+                    
+                        
+                    CreateHigh(_i, Color3.new(0, 1, 0.984313))
+                end
+            end
+        end
+    end
+
+    if exit_Current:FindFirstChild("Exit") then
+        
+        CreateHigh(exit_Current:FindFirstChild("Exit"), Color3.new(0, 0.584313, 1))
+    end
+    
+    if exit_Current:FindFirstChild("Wall") and exit_Current.Wall:FindFirstChild("Roof") then
+            
+        exit_Current.Wall.Roof:Destroy()
+    end
+
+    if exit_Current:FindFirstChild("Wall") and exit_Current.Wall:FindFirstChild("Exit") then
+            
+        for _, i in ipairs(exit_Current.Wall:GetChildren()) do
+            if i.Name == "Exit" then
+                    
+                    
+                CreateHigh(i, Color3.new(1, 0, 0))
+            end
+        end
+    end
+
+    for _, k in ipairs(exit_Current.Mechanic:GetChildren()) do
+        if k.Name == "ChasingWall" then
+            
+            for _, i in ipairs(k:GetChildren()) do
+                
+                if i:FindFirstChild("Peril") then
+                    
+                    
+                    CreateHigh(i.Peril, Color3.new(1, 0, 0))
+                end
+
+                if i:FindFirstChild("Trigger") then
+                    
+                    i.Trigger:Destroy()
+                end
+            end
+        end
+    end
+
+    for _, k in ipairs(exit_Current.Mechanic.ButtonDoor:GetChildren()) do
+                
+        if k.Name == "Door" then
+            for _, i in ipairs(k:GetChildren()) do
+                        
+                if i.Name == "Button" then
+                            
+                    CreateHigh(i, Color3.new(0, 1, 0.082352))
+                end
+            end
+        end
+
+        if k.Name == "ButtonDoor" then
+                    
+                    
+            for _, i in ipairs(k:GetChildren()) do
+                        
+                                    
+                if i.Name == "Button" then
+                                        
+                    CreateHigh(i, Color3.new(0, 1, 0.082352))
+                end
+            end
+        end
+    end
+end
+
+workspace.Map.ChildAdded:Connect(function(child)
+
+            local ti = GetTimeLvl(child.Name)
+            print(ti, 54456345634563546354635463456)
+            if ti then
+                frame.Text = ti
+            end
+
+            repeat task.wait(0.1) until child:FindFirstChild("Mechanic")
+            repeat task.wait(0.1) until child:FindFirstChild("Exit")
+            repeat task.wait(0.1) until child:FindFirstChild("Wall")
+
+            if child:FindFirstChild("Exit") then
+                
+                CreateHigh(child:FindFirstChild("Exit"), Color3.new(0, 0.584313, 1))
+            end
+
+            for _, k in ipairs(child.Mechanic:GetChildren()) do
+
+                print(k.Name == "ChasingWall")
+                if k.Name == "ChasingWall" then
+                    
+                    for _, i in ipairs(k:GetChildren()) do
+                        if i:FindFirstChild("Peril") then
+                            
+                            
+                            CreateHigh(i.Peril, Color3.new(1, 0, 0))
+                        end
+
+                                
+                        if i:FindFirstChild("Trigger") then
+                            
+                            i.Trigger:Destroy()
+                        end
+                    end
+                end
+            end
+
+            for _, k in ipairs(child.Mechanic.ButtonDoor:GetChildren()) do
+                
+                if k.Name == "Door" then
+                    for _, i in ipairs(k:GetChildren()) do
+                        
+                        if i.Name == "Button" then
+                            
+                            CreateHigh(i, Color3.new(0, 1, 0.082352))
+                        end
+                    end
+                end
+
+                if k.Name == "ButtonDoor" then
+                    
+                    
+                    for _, i in ipairs(k:GetChildren()) do
+                            
+                        if i.Name == "Button" then
+                                        
+                            CreateHigh(i, Color3.new(0, 1, 0.082352))
+                        end
+                    end
+                end
+            end
+
+            if child:FindFirstChild("Wall") and child.Wall:FindFirstChild("Exit") then
+                
+                for _, i in ipairs(child.Wall:GetChildren()) do
+                    if i.Name == "Exit" then
+                        
+                        
+                        CreateHigh(i, Color3.new(1, 0, 0))
+                    end
+                end
+            end
+            if child:FindFirstChild("Wall") and child.Wall:FindFirstChild("Roof") then
+                
+                child.Wall.Roof:Destroy()
+            end
+end)
+
+
+workspace.Debris.Alive.ChildAdded:Connect(function(child)
+    
+    if child:IsA("Folder") then
+        child.ChildAdded:Connect(function(_child)
+            
+            if _child:IsA("Folder") then
+                
+				repeat
+					task.wait(0.1)
+				until _child:FindFirstChildWhichIsA("Model") 
+
+                if _child:FindFirstChildWhichIsA("Model") then
+                    
+                    for _, _i in ipairs(_child:GetChildren()) do
+                        
+                            
+                        CreateHigh(_i, Color3.new(0, 1, 0.984313))
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+task.spawn(function()
+    while task.wait(1) do
+        Lighting.FogEnd = 100000
+        for i,v in pairs(Lighting:GetDescendants()) do
+            if v:IsA("Atmosphere") then
+                v:Destroy()
+            end
+        end
+    end
+end)
