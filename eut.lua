@@ -16,6 +16,7 @@ end
 
 local color_validate = Color3.new(0.717647, 1, 0.666667)
 
+print("EUT GO GO GO")
 makefolder("eut")
 
 local file_path = "eut/saved.json"
