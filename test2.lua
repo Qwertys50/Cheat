@@ -1,9 +1,14 @@
+game.Players.PlayerAdded:Connect(function(player)
+    if player == game.Players.LocalPlayer then
+        
+        player.OnTeleport:Connect(function()
 
-game.Players.LocalPlayer.OnTeleport:Connect(function()
+            queue_on_teleport(string.format([[
+                loadstring(game:HttpGet("%s"))()
+            ]], "https://raw.githubusercontent.com/Qwertys50/Cheat/refs/heads/main/test2.lua"))
+        end)
 
-    queue_on_teleport(string.format([[
-        loadstring(game:HttpGet("%s"))()
-    ]], "https://raw.githubusercontent.com/Qwertys50/Cheat/refs/heads/main/test.lua"))
+    end
 end)
 
 task.wait(1)
