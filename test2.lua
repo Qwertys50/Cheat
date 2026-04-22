@@ -40,7 +40,7 @@ while task.wait() do
 
     print(a)
     if a == 0 then 
-        task.wait(1)
+        task.wait(10)
         game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
         
     break end
