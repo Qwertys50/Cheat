@@ -1,3 +1,5 @@
+local stoped = false
+
 game.Players.PlayerAdded:Connect(function(player)
     if player == game.Players.LocalPlayer then
         
@@ -23,5 +25,22 @@ for _, i in ipairs(game.Players:GetPlayers()) do
     end
 end
 
-task.wait(1)
-game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
+
+while task.wait() do  
+    local a = 0  
+    for _, i in ipairs(workspace:GetChildren()) do
+        
+        a += 1
+
+        if i.Name == "Lolipop" then 
+            task.wait()
+            game.Players.LocalPlayer.Character.PrimaryPart.CFrame = i.CFrame
+        end
+    end
+
+    if a == 0 then 
+        task.wait(1)
+        game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
+        
+    break end
+end
