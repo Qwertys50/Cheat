@@ -30,14 +30,15 @@ while task.wait() do
     local a = 0  
     for _, i in ipairs(workspace:GetChildren()) do
         
-        a += 1
 
         if i.Name == "Lolipop" then 
+            a += 1
             task.wait()
             game.Players.LocalPlayer.Character.PrimaryPart.CFrame = i.CFrame
         end
     end
 
+    print(a)
     if a == 0 then 
         task.wait(1)
         game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
