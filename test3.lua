@@ -42,4 +42,4 @@ for _, i in ipairs(Workspace:GetChildren()) do
 	end
 end
 
-if a == 0 then ame:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer) end
+if a == 0 then game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer) end
