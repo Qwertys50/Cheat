@@ -70,7 +70,7 @@ workspace.CurrentRooms["0"].Door.AttributeChanged:Connect(function(attributeName
         task.wait(3.5)
         local text = game:GetService("Players").LocalPlayer.PlayerGui.MainUI.DeathPanel.PlayAgain.Timer.Text
 
-        while #game:GetService("Players").LocalPlayer.PlayerGui.MainUI.DeathPanel.PlayAgain.Timer.Text > 0 do
+        while #game:GetService("Players").LocalPlayer.PlayerGui.MainUI.DeathPanel.PlayAgain.Timer.Text == 0 do
             task.wait(1)
             game:GetService("ReplicatedStorage"):WaitForChild("RemotesFolder"):WaitForChild("PlayAgain"):FireServer()
         end
