@@ -56,45 +56,6 @@ local function hasKey()
     return false
 end
 
-
-local Event = game:GetService("ReplicatedStorage").RemotesFolder.ElevatorFinished
-for _, Connection in getconnections(Event.OnClientEvent) do
-	local old; old = hookfunction(Connection.Function, function(...)
-		
-        print(1234678)
-        local ch = plr.Character
-		print(`Intercepted (Connection) {Event.Name}.OnClientEvent`, ...)
-        
-        st += 1
-
-        if st == 0 then return end
-        if started then return end
-        started =  true
-
-        ch:PivotTo(CFrame1)
-        task.wait(0.5)
-
-        while not hasKey() do
-            
-            ch.PrimaryPart.CFrame = workspace.CurrentRooms["0"].Assets.KeyObtain.Hitbox.CFrame
-            fireproximityprompt(workspace.CurrentRooms["0"].Assets.KeyObtain.ModulePrompt)
-
-            task.wait(0)
-        end
-
-        ch:PivotTo(CFrame6)
-        task.wait(0.5)
-        ch:PivotTo(CFrame7)
-        task.wait(0.5)
-        ch:PivotTo(CFrame8)
-        task.wait(0.5)
-        ch:PivotTo(CFrame9)
-
-        task.wait(0.5)
-        fireproximityprompt(workspace.CurrentRooms["0"].Door.Lock.UnlockPrompt)
-		return old(...)
-	end)
-end
 for i=1, 5 do game:GetService("ReplicatedStorage").RemotesFolder.PreRunShop:FireServer({}) end
 fireproximityprompt(workspace.CurrentRooms["0"].StarterElevator.Model.Model.SkipButton.SkipPrompt)
 
@@ -108,3 +69,29 @@ workspace.CurrentRooms["0"].Door.AttributeChanged:Connect(function(attributeName
         game:GetService("ReplicatedStorage"):WaitForChild("RemotesFolder"):WaitForChild("PlayAgain"):FireServer()
     end
 end)
+
+task.wait(2)
+
+local ch = plr.Character
+started =  true
+ch:PivotTo(CFrame1)
+task.wait(0.5)
+
+while not hasKey() do
+            
+    ch.PrimaryPart.CFrame = workspace.CurrentRooms["0"].Assets.KeyObtain.Hitbox.CFrame
+    fireproximityprompt(workspace.CurrentRooms["0"].Assets.KeyObtain.ModulePrompt)
+
+    task.wait(0)
+end
+
+ch:PivotTo(CFrame6)
+task.wait(0.5)
+ch:PivotTo(CFrame7)
+task.wait(0.5)
+ch:PivotTo(CFrame8)
+task.wait(0.5)
+ch:PivotTo(CFrame9)
+
+task.wait(0.5)
+fireproximityprompt(workspace.CurrentRooms["0"].Door.Lock.UnlockPrompt)
