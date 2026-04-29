@@ -25,13 +25,82 @@ for _, i in ipairs(game.Players:GetPlayers()) do
     end
 end
 
+task.wait(1)
 
-while not game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("MainUI") do task.wait() end
-while not game:GetService("Players").LocalPlayer.PlayerGui.MainUI:FindFirstChild("ItemShop") do task.wait() end
+local CFrame1 = CFrame.new(249.999954, -0.373500377, -9.99999714, 0.99999994, 0, 0.00037855946, 0, 1, 0, -0.00037855946, 0, 0.99999994)
+local CFrame6 = CFrame.new(243.364471, -0.373500377, -50.2721786, 0.066934742, 0, 0.997757375, 0, 1, 0, -0.997757375, 0, 0.066934742)
+local CFrame7 = CFrame.new(233.599655, -0.373700649, -50.2435303, 0.997149467, -2.91114155e-09, -0.0754518881, 2.93498448e-09, 1, 2.05117964e-10, 0.0754518881, -4.25983387e-10, 0.997149467)
+local CFrame8 = CFrame6
+local CFrame9 = CFrame.new(265.916351, -0.400000364, -49.2707405, 0.9997859, -2.269335e-10, 0.0206931699, 2.26197741e-10, 1, 3.78962799e-11, -0.0206931699, -3.32074195e-11, 0.9997859)
 
-local a = game:GetService("Players").LocalPlayer.PlayerGui.MainUI.ItemShop :: TextLabel
+local plr = game.Players.LocalPlayer
 
-a:GetPropertyChangedSignal("Visible"):Connect(function()
+local started = false
+local st = 0
+
+
+local function hasKey()
+    if plr.Character:FindFirstChild("Key") then
+        return true
+    end
     
-    print(a.Visible)
+    local backpack = plr:FindFirstChild("Backpack")
+    if backpack and backpack:FindFirstChild("Key") then
+        return true
+    end
+    
+    return false
+end
+
+
+local Event = game:GetService("ReplicatedStorage").RemotesFolder.ElevatorFinished
+for _, Connection in getconnections(Event.OnClientEvent) do
+	local old; old = hookfunction(Connection.Function, function(...)
+		
+        
+        local ch = plr.Character
+		print(`Intercepted (Connection) {Event.Name}.OnClientEvent`, ...)
+        
+        st += 1
+
+        if st == 0 then return end
+        if started then return end
+        started =  true
+
+        ch:PivotTo(CFrame1)
+        task.wait(0.5)
+
+        while not hasKey() do
+            
+            ch.PrimaryPart.CFrame = workspace.CurrentRooms["0"].Assets.KeyObtain.Hitbox.CFrame
+            fireproximityprompt(workspace.CurrentRooms["0"].Assets.KeyObtain.ModulePrompt)
+
+            task.wait(0)
+        end
+
+        ch:PivotTo(CFrame6)
+        task.wait(0.5)
+        ch:PivotTo(CFrame7)
+        task.wait(0.5)
+        ch:PivotTo(CFrame8)
+        task.wait(0.5)
+        ch:PivotTo(CFrame9)
+
+        task.wait(0.5)
+        fireproximityprompt(workspace.CurrentRooms["0"].Door.Lock.UnlockPrompt)
+		return old(...)
+	end)
+end
+for i=1, 5 do game:GetService("ReplicatedStorage").RemotesFolder.PreRunShop:FireServer({}) end
+fireproximityprompt(workspace.CurrentRooms["0"].StarterElevator.Model.Model.SkipButton.SkipPrompt)
+
+
+workspace.CurrentRooms["0"].Door.AttributeChanged:Connect(function(attributeName)
+    if attributeName == "Opened" then
+        
+        task.wait(0.5)
+        replicatesignal(plr.Kill)
+        task.wait(0.1)
+        game:GetService("ReplicatedStorage"):WaitForChild("RemotesFolder"):WaitForChild("PlayAgain"):FireServer()
+    end
 end)
