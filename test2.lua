@@ -1,30 +1,5 @@
 local stoped = false
 
-game.Players.PlayerAdded:Connect(function(player)
-    if player == game.Players.LocalPlayer then
-        
-        player.OnTeleport:Connect(function()
-
-            queue_on_teleport(string.format([[
-                loadstring(game:HttpGet("%s"))()
-            ]], "https://raw.githubusercontent.com/Qwertys50/Cheat/refs/heads/main/test2.lua"))
-        end)
-
-    end
-end)
-
-for _, i in ipairs(game.Players:GetPlayers()) do
-    
-    if i == game.Players.LocalPlayer then
-        i.OnTeleport:Connect(function()
-
-            queue_on_teleport(string.format([[
-                loadstring(game:HttpGet("%s"))()
-            ]], "https://raw.githubusercontent.com/Qwertys50/Cheat/refs/heads/main/test2.lua"))
-        end)
-    end
-end
-
 task.wait(1)
 
 while not workspace:FindFirstChild("CurrentRooms") do task.wait() end
@@ -33,9 +8,6 @@ while not workspace.CurrentRooms["0"]:FindFirstChild("StarterElevator") do task.
 
 local CFrame1 = CFrame.new(249.999954, -0.373500377, -9.99999714, 0.99999994, 0, 0.00037855946, 0, 1, 0, -0.00037855946, 0, 0.99999994)
 local CFrame6 = CFrame.new(243.364471, -0.373500377, -50.2721786, 0.066934742, 0, 0.997757375, 0, 1, 0, -0.997757375, 0, 0.066934742)
-local CFrame7 = CFrame.new(233.599655, -0.373700649, -50.2435303, 0.997149467, -2.91114155e-09, -0.0754518881, 2.93498448e-09, 1, 2.05117964e-10, 0.0754518881, -4.25983387e-10, 0.997149467)
-local CFrame8 = CFrame6
-local CFrame9 = CFrame.new(265.916351, -0.400000364, -49.2707405, 0.9997859, -2.269335e-10, 0.0206931699, 2.26197741e-10, 1, 3.78962799e-11, -0.0206931699, -3.32074195e-11, 0.9997859)
 
 local plr = game.Players.LocalPlayer
 
@@ -66,8 +38,21 @@ workspace.CurrentRooms["0"].Door.AttributeChanged:Connect(function(attributeName
         ended = true
         task.wait(0.5)
         replicatesignal(plr.Kill)
-        task.wait(1)
+        
+        task.wait(0.3)
         game:GetService("ReplicatedStorage"):WaitForChild("RemotesFolder"):WaitForChild("PlayAgain"):FireServer()
+
+        task.wait(3.5)
+        local text = game:GetService("Players").LocalPlayer.PlayerGui.MainUI.DeathPanel.PlayAgain.Timer.Text
+
+        while game:GetService("Players").LocalPlayer.PlayerGui.MainUI.DeathPanel.PlayAgain.Timer.Text == text do
+            task.wait(0)
+            if #game:GetService("Players").LocalPlayer.PlayerGui.MainUI.DeathPanel.PlayAgain.Timer.Text > 0 then
+                break
+            end
+            game:GetService("ReplicatedStorage"):WaitForChild("RemotesFolder"):WaitForChild("PlayAgain"):FireServer()
+        end
+        if #game:GetService("Players").LocalPlayer.PlayerGui.MainUI.DeathPanel.PlayAgain.Timer.Text == 0 then game:GetService("ReplicatedStorage"):WaitForChild("RemotesFolder"):WaitForChild("PlayAgain"):FireServer() end
     end
 end)
 
