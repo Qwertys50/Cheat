@@ -29,6 +29,7 @@ task.wait(1)
 
 while not workspace:FindFirstChild("CurrentRooms") do task.wait() end
 while not workspace.CurrentRooms:FindFirstChild("0") do task.wait() end
+while not workspace.CurrentRooms["0"]:FindFirstChild("StarterElevator") do task.wait() end
 
 local CFrame1 = CFrame.new(249.999954, -0.373500377, -9.99999714, 0.99999994, 0, 0.00037855946, 0, 1, 0, -0.00037855946, 0, 0.99999994)
 local CFrame6 = CFrame.new(243.364471, -0.373500377, -50.2721786, 0.066934742, 0, 0.997757375, 0, 1, 0, -0.997757375, 0, 0.066934742)
