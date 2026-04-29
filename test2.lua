@@ -71,7 +71,7 @@ workspace.CurrentRooms["0"].Door.AttributeChanged:Connect(function(attributeName
         local text = game:GetService("Players").LocalPlayer.PlayerGui.MainUI.DeathPanel.PlayAgain.Timer.Text
 
         while game:GetService("Players").LocalPlayer.PlayerGui.MainUI.DeathPanel.PlayAgain.Timer.Text == text do
-            task.wait(0)
+            task.wait(1)
             if #game:GetService("Players").LocalPlayer.PlayerGui.MainUI.DeathPanel.PlayAgain.Timer.Text > 0 then
                 break
             end
