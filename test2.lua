@@ -61,7 +61,7 @@ local Event = game:GetService("ReplicatedStorage").RemotesFolder.ElevatorFinishe
 for _, Connection in getconnections(Event.OnClientEvent) do
 	local old; old = hookfunction(Connection.Function, function(...)
 		
-        
+        print(1234678)
         local ch = plr.Character
 		print(`Intercepted (Connection) {Event.Name}.OnClientEvent`, ...)
         
