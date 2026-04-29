@@ -1,4 +1,8 @@
 local stoped = false
+if _G.SCRIPT_EXECUTED then
+    return
+end
+_G.SCRIPT_EXECUTED = true
 
 game.Players.PlayerAdded:Connect(function(player)
     if player == game.Players.LocalPlayer then
