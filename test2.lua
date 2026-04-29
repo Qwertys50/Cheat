@@ -26,22 +26,12 @@ for _, i in ipairs(game.Players:GetPlayers()) do
 end
 
 
-while task.wait() do  
-    local a = 0  
-    for _, i in ipairs(workspace:GetChildren()) do
-        
+while not game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("MainUI") do task.wait() end
+while not game:GetService("Players").LocalPlayer.PlayerGui.MainUI:FindFirstChild("ItemShop") do task.wait() end
 
-        if i.Name == "Lolipop" then 
-            a += 1
-            task.wait()
-            game.Players.LocalPlayer.Character.PrimaryPart.CFrame = i.CFrame
-        end
-    end
+local a = game:GetService("Players").LocalPlayer.PlayerGui.MainUI.ItemShop :: TextLabel
 
-    print(a)
-    if a == 0 then 
-        task.wait(10)
-        game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
-        
-    break end
-end
+a:GetPropertyChangedSignal("Visible"):Connect(function()
+    
+    print(a.Visible)
+end)
