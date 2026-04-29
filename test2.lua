@@ -66,7 +66,7 @@ workspace.CurrentRooms["0"].Door.AttributeChanged:Connect(function(attributeName
         ended = true
         task.wait(0.5)
         replicatesignal(plr.Kill)
-        task.wait(0.1)
+        task.wait(1)
         game:GetService("ReplicatedStorage"):WaitForChild("RemotesFolder"):WaitForChild("PlayAgain"):FireServer()
     end
 end)
