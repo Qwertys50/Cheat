@@ -71,6 +71,8 @@ end)
 
 game:GetService("ReplicatedStorage").RemotesFolder.Statistics.OnClientEvent:Connect(function()
     stoped = true
+
+    print(1)
     if stoped then return end
     print("TEST")
     game:GetService("ReplicatedStorage"):WaitForChild("RemotesFolder"):WaitForChild("PlayAgain"):FireServer()
