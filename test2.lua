@@ -39,7 +39,7 @@ local CFrame9 = CFrame.new(265.916351, -0.400000364, -49.2707405, 0.9997859, -2.
 
 local plr = game.Players.LocalPlayer
 
-local started = false
+local ended = false
 local st = 0
 
 
@@ -63,6 +63,7 @@ fireproximityprompt(workspace.CurrentRooms["0"].StarterElevator.Model.Model.Skip
 workspace.CurrentRooms["0"].Door.AttributeChanged:Connect(function(attributeName)
     if attributeName == "Opened" then
         
+        ended = true
         task.wait(0.5)
         replicatesignal(plr.Kill)
         task.wait(0.1)
@@ -87,11 +88,11 @@ end
 
 ch:PivotTo(CFrame6)
 task.wait(0.5)
-ch:PivotTo(CFrame7)
-task.wait(0.5)
-ch:PivotTo(CFrame8)
-task.wait(0.5)
-ch:PivotTo(CFrame9)
 
-task.wait(0.5)
-fireproximityprompt(workspace.CurrentRooms["0"].Door.Lock.UnlockPrompt)
+while not ended do
+            
+    ch.PrimaryPart.CFrame = CFrame.new(265.486267, -0.400000364, -48.4754181, 0.999383152, 3.15590509e-09, 0.0351186804, -2.2460569e-09, 1, -2.59472621e-08, -0.0351186804, 2.5852378e-08, 0.999383152)
+    fireproximityprompt(workspace.CurrentRooms["0"].Door.Lock.UnlockPrompt)
+
+    task.wait(0)
+end
