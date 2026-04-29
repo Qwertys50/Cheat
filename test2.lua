@@ -3,7 +3,7 @@ local stoped = false
 game.Players.PlayerAdded:Connect(function(player)
     if player == game.Players.LocalPlayer then
         
-            print(123)
+            print(123, "NIGGA")
         player.OnTeleport:Connect(function()
 
             queue_on_teleport(string.format([[
@@ -17,7 +17,7 @@ end)
 for _, i in ipairs(game.Players:GetPlayers()) do
     
     if i == game.Players.LocalPlayer then
-            print(123)
+            print(123, "KNIGA")
         i.OnTeleport:Connect(function()
 
             queue_on_teleport(string.format([[
